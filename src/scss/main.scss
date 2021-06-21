@@ -1,0 +1,51 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+.wrapper {
+  margin: 100px auto;
+  position: relative;
+  width: 1080px;
+  height: 320px;
+
+  .canvas {
+    display: block;
+    background: #eee;
+    &__form {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1080px;
+      height: 320px;
+      background: #000;
+    }
+    &__score {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1080px;
+      height: 320px;
+      background: #000;
+      color: #fff;
+      &-inner {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+      }
+    }
+  }
+}
+.canvas__form.active {
+  display: flex;
+}
+
+.canvas__score.active {
+  display: flex;
+}
