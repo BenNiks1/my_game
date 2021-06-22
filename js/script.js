@@ -38,15 +38,18 @@ class MyGame {
 
   collision(player, barrier) {
     if (
-      barrier.x + barrier.width>= player.playerX &&
+      barrier.x + barrier.width >= player.playerX &&
       barrier.x + barrier.width <= player.playerX + player.width &&
       barrier.y >= player.playerY &&
       barrier.y - barrier.height + 10 <=
         player.playerY - player.jumpHeight + player.height
     ) {
-      // this.life = Math.round((this.life-1))/3;
-      this.life--
       this.collisionHandler = true;
+      // if(this.collisionHandler){
+      this.life = this.life - 1 / 10;
+
+      //   this.collisionHandler = false
+      // }
     } else if (
       barrier.x + barrier.width >= player.playerX &&
       barrier.x <= player.playerX
@@ -58,12 +61,12 @@ class MyGame {
   drawScore() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#000";
-    this.ctx.fillText("Score: " + Math.floor(this.score / 4) * 10, 8, 20);
+    this.ctx.fillText(`Score: ${Math.floor(this.score / 4) * 10}`, 8, 20);
   }
   drawLife() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#000";
-    this.ctx.fillText("Life: " + this.life, 8, 40);
+    this.ctx.fillText(`Life: ${Math.floor(this.life) + 3}`, 8, 40);
   }
 }
 
@@ -82,7 +85,7 @@ class Player extends MyGame {
     this.downPressed = false;
     this.color = "#000";
 
-    this.playerX = (this.canvas.width - this.width) / 5;
+    this.playerX = (this.canvas.width - this.width) / 2;
     this.playerY = this.canvas.height - this.height;
   }
 
@@ -181,7 +184,6 @@ const keyDownHandler = (e) => {
   // enter
   if (e.keyCode == 13) {
     myGame.pause = false;
-    // myGame.play = setInterval(draw, 10);
   }
   // space
   if (e.keyCode == 32) {
