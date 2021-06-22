@@ -16,6 +16,7 @@ class MyGame {
     this.y = this.canvas.height;
     this.start = false;
     this.pause = true;
+    this.collisionHandler = false;
     this.userName = "";
     this.key = new Date();
   }
@@ -45,6 +46,7 @@ class MyGame {
         player.playerY - player.jumpHeight + player.height
     ) {
       this.life = this.life - 1 / 10;
+      this.collisionHandler = true;
     } else if (
       barrier.x + barrier.width >= player.playerX &&
       barrier.x <= player.playerX
@@ -78,9 +80,11 @@ class Player extends MyGame {
     this.jumpHeight = 0;
     this.upPressed = false;
     this.downPressed = false;
+    this.color = "#000";
 
     this.playerX = (this.canvas.width - this.width) / 5;
     this.playerY = this.canvas.height - this.height;
+    
   }
 
   jump() {
@@ -100,7 +104,7 @@ class Player extends MyGame {
   }
 
   sitDown() {
-    if (this.downPressed) {
+    if (this.downPressed && !this.upPressed) {
       this.height = 30;
       this.playerY = this.canvas.height - this.height;
     } else {
@@ -117,7 +121,12 @@ class Player extends MyGame {
       this.width,
       this.height
     );
-    this.ctx.fillStyle = "#000";
+    this.ctx.fillStyle = this.color;
+    if (myGame.collisionHandler) {
+      myGame.collisionHandler = false;
+      this.color = "red";
+      setTimeout(()=>{this.color='#000'}, 100)
+    }
     this.ctx.fill();
     this.ctx.closePath();
   }
@@ -130,7 +139,6 @@ class Barrier extends MyGame {
     this.ctx = ctx;
     this.width = 20;
     this.height = 20;
-    // this.x = this.canvas.width - 20;
     this.x = Math.round(Math.random() * (1400 - 1080) + 1080);
     this.y = this.canvas.height - barrierY;
     this.color = color;
@@ -204,7 +212,7 @@ const addUserScore = () => {
     if (index < 10) {
       listItem.innerHTML = `${index + 1}. ${item.name} - ${item.score}`;
     }
-    if (index>=10&&item.key == myGame.key) {
+    if (index >= 10 && item.key == myGame.key) {
       listItem.innerHTML += `...</br>${index + 1}. ${item.name} - ${
         item.score
       }`;
