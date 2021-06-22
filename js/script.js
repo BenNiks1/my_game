@@ -74,7 +74,7 @@ class Player extends MyGame {
     this.width = 50;
     this.height = 50;
     this.jumpCount = 0;
-    this.jumpLength = 30;
+    this.jumpLength = 25;
     this.jumpHeight = 0;
     this.upPressed = false;
     this.downPressed = false;
