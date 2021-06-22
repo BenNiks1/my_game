@@ -72,9 +72,9 @@ class Player extends MyGame {
     this.ctx = ctx;
 
     this.width = 50;
-    this.height = 50;
+    this.height = 70;
     this.jumpCount = 0;
-    this.jumpLength = 25;
+    this.jumpLength = 35;
     this.jumpHeight = 0;
     this.upPressed = false;
     this.downPressed = false;
@@ -104,7 +104,7 @@ class Player extends MyGame {
       this.height = 30;
       this.playerY = this.canvas.height - this.height;
     } else {
-      this.height = 50;
+      this.height = 70;
       this.playerY = this.canvas.height - this.height;
     }
   }
@@ -237,7 +237,7 @@ const draw = () => {
 };
 const myGame = new MyGame(canvas, ctx, draw);
 const barrier = new Barrier(20, "#fac");
-const barrier2 = new Barrier(50, "red");
+const barrier2 = new Barrier(70, "red");
 const player = new Player();
 
 document.addEventListener("keydown", keyDownHandler);
