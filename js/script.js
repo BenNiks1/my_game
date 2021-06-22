@@ -28,24 +28,24 @@ class MyGame {
     }
     enterNameBtn.onclick = (e) => {
       e.preventDefault();
-
+      this.play = setInterval(this.func, 10);
       const input = document.querySelector(".canvas__input");
       const canvasForm = document.querySelector(".canvas__form");
       this.userName = input.value;
       canvasForm.classList.remove("active");
-      console.log(new Date());
     };
   }
 
   collision(player, barrier) {
     if (
-      barrier.x + barrier.width >= player.playerX &&
+      barrier.x + barrier.width>= player.playerX &&
       barrier.x + barrier.width <= player.playerX + player.width &&
       barrier.y >= player.playerY &&
       barrier.y - barrier.height + 10 <=
         player.playerY - player.jumpHeight + player.height
     ) {
-      this.life = this.life - 1 / 10;
+      // this.life = Math.round((this.life-1))/3;
+      this.life--
       this.collisionHandler = true;
     } else if (
       barrier.x + barrier.width >= player.playerX &&
@@ -63,7 +63,7 @@ class MyGame {
   drawLife() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#000";
-    this.ctx.fillText("Life: " + Math.round(this.life + 3), 8, 40);
+    this.ctx.fillText("Life: " + this.life, 8, 40);
   }
 }
 
@@ -84,7 +84,6 @@ class Player extends MyGame {
 
     this.playerX = (this.canvas.width - this.width) / 5;
     this.playerY = this.canvas.height - this.height;
-    
   }
 
   jump() {
@@ -123,9 +122,11 @@ class Player extends MyGame {
     );
     this.ctx.fillStyle = this.color;
     if (myGame.collisionHandler) {
-      myGame.collisionHandler = false;
       this.color = "red";
-      setTimeout(()=>{this.color='#000'}, 100)
+      myGame.collisionHandler = false;
+      setTimeout(() => {
+        this.color = "#000";
+      }, 100);
     }
     this.ctx.fill();
     this.ctx.closePath();
@@ -133,13 +134,17 @@ class Player extends MyGame {
 }
 
 class Barrier extends MyGame {
-  constructor(barrierY, color) {
+  constructor(barrierY, color, minWidth, maxWidth) {
     super(canvas, ctx);
     this.canvas = canvas;
     this.ctx = ctx;
     this.width = 20;
     this.height = 20;
-    this.x = Math.round(Math.random() * (1400 - 1080) + 1080);
+    this.maxWidth = maxWidth;
+    this.minWidth = minWidth;
+    this.x = Math.round(
+      Math.random() * (this.maxWidth - this.minWidth) + this.minWidth
+    );
     this.y = this.canvas.height - barrierY;
     this.color = color;
   }
@@ -153,7 +158,9 @@ class Barrier extends MyGame {
   move(barrier) {
     this.x -= this.speed;
     if (barrier.x <= 0) {
-      barrier.x = Math.round(Math.random() * (1400 - 1080) + 1080);
+      barrier.x = Math.round(
+        Math.random() * (this.maxWidth - this.minWidth) + this.minWidth
+      );
     }
   }
 }
@@ -174,7 +181,7 @@ const keyDownHandler = (e) => {
   // enter
   if (e.keyCode == 13) {
     myGame.pause = false;
-    myGame.play = setInterval(draw, 10);
+    // myGame.play = setInterval(draw, 10);
   }
   // space
   if (e.keyCode == 32) {
@@ -238,14 +245,15 @@ const draw = () => {
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
-  if (myGame.life <= -3) {
-    clearInterval(myGame.play);
-    addUserScore();
-  }
+  // if (myGame.life <= -3) {
+  //   clearInterval(myGame.play);
+  //   addUserScore();
+  // }
+  // console.log(   player.playerX + player.width);
 };
 const myGame = new MyGame(canvas, ctx, draw);
-const barrier = new Barrier(20, "#fac");
-const barrier2 = new Barrier(70, "red");
+const barrier = new Barrier(20, "#fac", 1480, 1600);
+const barrier2 = new Barrier(70, "red", 1900, 2000);
 const player = new Player();
 
 document.addEventListener("keydown", keyDownHandler);
