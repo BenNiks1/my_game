@@ -169,7 +169,8 @@ class Barrier extends MyGame {
     this.height = 20;
     this.maxWidth = maxWidth;
     this.minWidth = minWidth;
-    this.x = Math.floor(Math.random() * this.maxWidth + this.minWidth);
+    // this.x = Math.floor(Math.random() * this.maxWidth + this.minWidth);
+    this.x = this.canvas.width + 20;
     this.y = this.canvas.height - barrierY;
     this.color = color;
   }
@@ -179,12 +180,6 @@ class Barrier extends MyGame {
     this.ctx.fillStyle = this.color;
     this.ctx.fill();
     this.ctx.closePath();
-  }
-  move(barrier) {
-    this.x -= myGame.speed;
-    if (barrier.x <= 0) {
-      barrier.x = Math.floor(Math.random() * this.maxWidth + this.minWidth);
-    }
   }
 }
 const keyDownHandler = (e) => {
@@ -249,6 +244,18 @@ const addUserScore = () => {
     canvasScoreInner.appendChild(listItem);
   });
 };
+const move = (b) => {
+  b.x -= myGame.speed;
+  if (b.x <= 0) {
+    b.x = Math.floor(Math.random() * 1800 + 1500);
+  }
+  if (
+    barrier.x + barrier.width + 200 >= barrier2.x &&
+    barrier.x - 200 <= barrier2.x + barrier2.width
+  ) {
+    barrier.x += 300;
+  }
+};
 
 const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -264,15 +271,17 @@ const draw = () => {
   myGame.drawScore();
   myGame.drawLife();
 
-  barrier.move(barrier);
-  barrier2.move(barrier2);
+  // barrier.move(barrier);
+  // barrier2.move(barrier2);
+  move(barrier);
+  move(barrier2);
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
-  if (myGame.life < -3) {
-    clearInterval(myGame.play);
-    addUserScore();
-  }
+  // if (myGame.life < -3) {
+  //   clearInterval(myGame.play);
+  //   addUserScore();
+  // }
 };
 const myGame = new MyGame(canvas, ctx, draw);
 const barrier = new Barrier(20, "#fac", 1900, 2000);
