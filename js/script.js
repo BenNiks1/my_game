@@ -65,7 +65,7 @@ class MyGame {
 
   drawBackground() {
     const bg = new Image();
-    bg.src = "./img/bg1.png";
+    bg.src = "./bg1.png";
     this.ctx.drawImage(bg, 0, 0, 1480, 520);
   }
 
@@ -77,8 +77,8 @@ class MyGame {
   drawLife() {
     const life = new Image();
     const noLife = new Image();
-    life.src = "./img/hearts_hud.png";
-    noLife.src = "./img/no_hearts_hud.png";
+    life.src = "./hearts_hud.png";
+    noLife.src = "./no_hearts_hud.png";
     switch (this.life) {
       case 0:
         this.ctx.drawImage(life, 10, 40, 25, 25);
@@ -154,8 +154,6 @@ class Player extends MyGame {
       this.height
     );
     this.ctx.fillStyle = myGame.color;
-    if (myGame.collisionHandler) {
-    }
     this.ctx.fill();
     this.ctx.closePath();
   }
