@@ -72,7 +72,7 @@ class MyGame {
   drawScore() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#fff";
-    this.ctx.fillText(`Score: ${Math.floor(this.score / 4) * 10}`, 8, 20);
+    this.ctx.fillText(`Score: ${Math.floor(this.score / 3) * 10}`, 8, 20);
   }
   drawLife() {
     const life = new Image();
