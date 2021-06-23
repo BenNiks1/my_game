@@ -19,6 +19,7 @@ class MyGame {
     this.collisionHandler = false;
     this.userName = "";
     this.key = new Date();
+    this.color = "rgb(117, 117, 117)";
   }
 
   startGame() {
@@ -45,11 +46,15 @@ class MyGame {
         player.playerY - player.jumpHeight + player.height
     ) {
       this.collisionHandler = true;
-      // if(this.collisionHandler){
-      this.life = this.life - 1 / 10;
-
-      //   this.collisionHandler = false
-      // }
+      if (this.collisionHandler) {
+        this.collisionHandler = false;
+        this.life = this.life - 1 / 10;
+        this.color = "red";
+        setTimeout(() => {
+          this.color = "rgb(117, 117, 117)";
+          this.life = Math.floor(this.life);
+        }, 100);
+      }
     } else if (
       barrier.x + barrier.width >= player.playerX &&
       barrier.x <= player.playerX
@@ -58,15 +63,40 @@ class MyGame {
     }
   }
 
+  drawBackground() {
+    const bg = new Image();
+    bg.src = "./img/bg1.png";
+    this.ctx.drawImage(bg, 0, 0, 1480, 520);
+  }
+
   drawScore() {
     this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#000";
+    this.ctx.fillStyle = "#fff";
     this.ctx.fillText(`Score: ${Math.floor(this.score / 4) * 10}`, 8, 20);
   }
   drawLife() {
-    this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#000";
-    this.ctx.fillText(`Life: ${Math.floor(this.life) + 3}`, 8, 40);
+    const life = new Image();
+    const noLife = new Image();
+    life.src = "./img/hearts_hud.png";
+    noLife.src = "./img/no_hearts_hud.png";
+    switch (this.life) {
+      case 0:
+        this.ctx.drawImage(life, 10, 40, 25, 25);
+        this.ctx.drawImage(life, 40, 40, 25, 25);
+        this.ctx.drawImage(life, 70, 40, 25, 25);
+      case -1:
+        this.ctx.drawImage(life, 10, 40, 25, 25);
+        this.ctx.drawImage(life, 40, 40, 25, 25);
+        this.ctx.drawImage(noLife, 70, 40, 25, 25);
+      case -2:
+        this.ctx.drawImage(life, 10, 40, 25, 25);
+        this.ctx.drawImage(noLife, 40, 40, 25, 25);
+        this.ctx.drawImage(noLife, 70, 40, 25, 25);
+      case -3:
+        this.ctx.drawImage(noLife, 10, 40, 25, 25);
+        this.ctx.drawImage(noLife, 40, 40, 25, 25);
+        this.ctx.drawImage(noLife, 70, 40, 25, 25);
+    }
   }
 }
 
@@ -83,9 +113,9 @@ class Player extends MyGame {
     this.jumpHeight = 0;
     this.upPressed = false;
     this.downPressed = false;
-    this.color = "#000";
+    
 
-    this.playerX = (this.canvas.width - this.width) / 2;
+    this.playerX = (this.canvas.width - this.width) / 5;
     this.playerY = this.canvas.height - this.height;
   }
 
@@ -123,18 +153,15 @@ class Player extends MyGame {
       this.width,
       this.height
     );
-    this.ctx.fillStyle = this.color;
+    this.ctx.fillStyle = myGame.color;
     if (myGame.collisionHandler) {
-      this.color = "red";
-      myGame.collisionHandler = false;
-      setTimeout(() => {
-        this.color = "#000";
-      }, 100);
     }
     this.ctx.fill();
     this.ctx.closePath();
   }
 }
+
+
 
 class Barrier extends MyGame {
   constructor(barrierY, color, minWidth, maxWidth) {
@@ -189,7 +216,7 @@ const keyDownHandler = (e) => {
   if (e.keyCode == 32) {
     myGame.pause = !myGame.pause;
     if (!myGame.pause) {
-      myGame.play = setInterval(draw, 10);
+      myGame.play = setInterval(draw, 20);
     }
   }
 };
@@ -233,12 +260,13 @@ const addUserScore = () => {
 const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   myGame.startGame();
-
+  myGame.drawBackground();
   player.drawPlayer();
   player.jump();
   player.sitDown();
   barrier.drawBarrier();
   barrier2.drawBarrier();
+
   myGame.drawScore();
   myGame.drawLife();
 
@@ -247,11 +275,10 @@ const draw = () => {
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
-  // if (myGame.life <= -3) {
-  //   clearInterval(myGame.play);
-  //   addUserScore();
-  // }
-  // console.log(   player.playerX + player.width);
+  if (myGame.life < -3) {
+    clearInterval(myGame.play);
+    addUserScore();
+  }
 };
 const myGame = new MyGame(canvas, ctx, draw);
 const barrier = new Barrier(20, "#fac", 1480, 1600);
