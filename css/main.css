@@ -17,6 +17,10 @@
 
 .wrapper .canvas__form {
   display: none;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -29,6 +33,11 @@
   width: 1480px;
   height: 520px;
   background: #000;
+}
+
+.wrapper .canvas__form p {
+  margin-top: 30px;
+  color: #fff;
 }
 
 .wrapper .canvas__score {
