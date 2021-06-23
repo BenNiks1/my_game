@@ -278,10 +278,10 @@ const draw = () => {
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
-  // if (myGame.life < -3) {
-  //   clearInterval(myGame.play);
-  //   addUserScore();
-  // }
+  if (myGame.life < -3) {
+    clearInterval(myGame.play);
+    addUserScore();
+  }
 };
 const myGame = new MyGame(canvas, ctx, draw);
 const barrier = new Barrier(20, "#fac", 1900, 2000);
