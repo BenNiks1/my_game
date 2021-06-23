@@ -6,8 +6,8 @@
 .wrapper {
   margin: 100px auto;
   position: relative;
-  width: 1080px;
-  height: 320px;
+  width: 1480px;
+  height: 520px;
 }
 
 .wrapper .canvas {
@@ -26,8 +26,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 1080px;
-  height: 320px;
+  width: 1480px;
+  height: 520px;
   background: #000;
 }
 
@@ -42,8 +42,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 1080px;
-  height: 320px;
+  width: 1480px;
+  height: 520px;
   background: #000;
   color: #fff;
 }
