@@ -9,7 +9,7 @@ class MyGame {
     this.func = func;
     this.play = setInterval(this.func, 10);
 
-    this.speed = 7;
+    this.speed = 15;
     this.score = 0;
     this.life = 0;
     this.x = this.canvas.width - 20;
@@ -23,13 +23,13 @@ class MyGame {
   }
 
   startGame() {
-    const enterNameBtn = document.querySelector(".canvas__form");
+    const submitStart = document.querySelector(".canvas__form");
     if (this.pause) {
       clearInterval(this.play);
     }
-    enterNameBtn.onsubmit = (e) => {
+    submitStart.onsubmit = (e) => {
       e.preventDefault();
-      this.play = setInterval(this.func, 10);
+      this.play = setInterval(this.func, 50);
       const input = document.querySelector(".canvas__input");
       const canvasForm = document.querySelector(".canvas__form");
       this.userName = input.value;
@@ -55,11 +55,15 @@ class MyGame {
           this.life = Math.floor(this.life);
         }, 100);
       }
-    } else if (
+    }
+    if (
       barrier.x + barrier.width >= player.playerX &&
       barrier.x <= player.playerX
     ) {
-      this.score++;
+      this.score = this.score + (1 / 3) * 10;
+      setTimeout(() => {
+        this.score = Math.round(this.score);
+      }, 100);
     }
   }
 
@@ -72,7 +76,7 @@ class MyGame {
   drawScore() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#fff";
-    this.ctx.fillText(`Score: ${Math.floor(this.score / 4) * 10}`, 8, 20);
+    this.ctx.fillText(`Score: ${this.score}`, 8, 20);
   }
   drawLife() {
     const life = new Image();
@@ -109,89 +113,122 @@ class Player extends MyGame {
     this.width = 50;
     this.height = 70;
     this.jumpCount = 0;
-    this.jumpLength = 35;
+    this.jumpLength = 20;
     this.jumpHeight = 0;
     this.upPressed = false;
     this.downPressed = false;
 
     this.playerX = (this.canvas.width - this.width) / 5;
     this.playerY = this.canvas.height - this.height;
+
+    this.img = new Image();
+    this.numColumns = 8;
+    this.numRows = 1;
+    this.frameWidth = 2000 / this.numColumns;
+    this.frameHeight = 98 / this.numRows;
+    this.currentFrame = 0;
   }
 
-  jump() {
+  drawPlayer() {
+    this.img.src = "./img/hero/newPlayer.png";
+    this.currentFrame++;
+
+    let maxFrame = this.numColumns * this.numRows - 1;
+    if (this.currentFrame > maxFrame) {
+      this.currentFrame = 0;
+    }
+
+    // jump
+    let column = this.currentFrame % this.numColumns;
+    let row = Math.floor(this.currentFrame / this.numColumns);
     if (this.upPressed) {
+      this.img.src = "./img/hero/Jump.png";
       this.jumpCount++;
       this.jumpHeight =
-        2 *
+        5 *
         this.jumpLength *
         Math.sin((Math.PI * this.jumpCount) / this.jumpLength);
     }
     if (this.jumpCount > this.jumpLength) {
+      
       this.jumpCount = 0;
       this.upPressed = false;
       this.jumpHeight = 0;
     }
-    this.status = true;
+    // sit down
+
+    this.ctx.drawImage(
+      this.img,
+      column * this.frameWidth,
+      row * this.frameHeight,
+      this.frameWidth,
+      this.frameHeight,
+      this.playerX,
+      this.playerY - this.jumpHeight,
+      this.frameWidth,
+      this.frameHeight
+    );
   }
 
   sitDown() {
     if (this.downPressed && !this.upPressed) {
-      this.height = 30;
+      this.img.src = "./img/hero/sitdown.png";
+      // this.height = 30;
       this.playerY = this.canvas.height - this.height;
     } else {
+      // this.img.src = "./img/hero/newPlayer.png";
       this.height = 70;
       this.playerY = this.canvas.height - this.height;
     }
   }
-
-  drawPlayer() {
-    this.ctx.beginPath();
-    this.ctx.rect(
-      this.playerX,
-      this.playerY - this.jumpHeight,
-      this.width,
-      this.height
-    );
-    this.ctx.fillStyle = myGame.color;
-    if (myGame.collisionHandler) {
-    }
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
 }
 
 class Barrier extends MyGame {
-  constructor(barrierY, color, minWidth, maxWidth) {
+  constructor(barrierY, color, imgSrc) {
     super(canvas, ctx);
     this.canvas = canvas;
     this.ctx = ctx;
     this.width = 20;
     this.height = 20;
-    this.maxWidth = maxWidth;
-    this.minWidth = minWidth;
-    this.x = Math.floor(
-      Math.random() * (this.maxWidth - this.minWidth) + this.minWidth
-    );
+    this.x = this.canvas.width + 20;
     this.y = this.canvas.height - barrierY;
     this.color = color;
+
+    this.img = new Image();
+    this.imgSrc = imgSrc;
+    this.numColumns = 8;
+    this.numRows = 1;
+    this.frameWidth = 128 / this.numColumns;
+    this.frameHeight = 16 / this.numRows;
+    this.currentFrame = 0;
   }
   drawBarrier() {
-    this.ctx.beginPath();
-    this.ctx.rect(this.x, this.y, this.width, this.height);
-    this.ctx.fillStyle = this.color;
-    this.ctx.fill();
-    this.ctx.closePath();
-  }
-  move(barrier) {
-    this.x -= this.speed;
-    if (barrier.x <= 0) {
-      
-      setTimeout(()=>{
-        barrier.x = Math.floor(
-          Math.random() * (this.maxWidth - this.minWidth) + this.minWidth)
-      },1000
-      )
+    this.img.src = this.imgSrc;
+    this.currentFrame++;
+
+    let maxFrame = this.numColumns * this.numRows - 1;
+    if (this.currentFrame > maxFrame) {
+      this.currentFrame = 0;
     }
+
+    let column = this.currentFrame % this.numColumns;
+    let row = Math.floor(this.currentFrame / this.numColumns);
+    this.ctx.drawImage(
+      this.img,
+      column * this.frameWidth,
+      row * this.frameHeight,
+      this.frameWidth,
+      this.frameHeight,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
+    // this.ctx.beginPath();
+    // this.ctx.rect(this.x, this.y, this.width, this.height);
+    // this.ctx.fillStyle = this.color;
+    // this.ctx.fill();
+    // this.ctx.closePath();
   }
 }
 const keyDownHandler = (e) => {
@@ -216,7 +253,7 @@ const keyDownHandler = (e) => {
   if (e.keyCode == 32) {
     myGame.pause = !myGame.pause;
     if (!myGame.pause) {
-      myGame.play = setInterval(draw, 10);
+      myGame.play = setInterval(draw, 50);
     }
   }
 };
@@ -256,33 +293,47 @@ const addUserScore = () => {
     canvasScoreInner.appendChild(listItem);
   });
 };
+const move = (b) => {
+  b.x -= myGame.speed;
+  if (b.x <= 0) {
+    b.x = Math.floor(Math.random() * 1800 + 1500);
+  }
+  if (
+    barrier.x + barrier.width + 200 >= barrier2.x &&
+    barrier.x - 200 <= barrier2.x + barrier2.width
+  ) {
+    barrier.x += 300;
+  }
+};
 
 const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   myGame.startGame();
-  myGame.drawBackground();
+  // myGame.drawBackground();
+
   player.drawPlayer();
-  player.jump();
-  player.sitDown();
+  player.sitDown()
+
   barrier.drawBarrier();
   barrier2.drawBarrier();
+  move(barrier);
+  move(barrier2);
 
   myGame.drawScore();
   myGame.drawLife();
 
-  barrier.move(barrier);
-  barrier2.move(barrier2);
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
-  if (myGame.life < -3) {
-    clearInterval(myGame.play);
-    addUserScore();
-  }
+  // if (myGame.life < -3) {
+  //   clearInterval(myGame.play);
+  //   addUserScore();
+  // }
 };
+
 const myGame = new MyGame(canvas, ctx, draw);
-const barrier = new Barrier(20, "#fac", 1900, 2000);
-const barrier2 = new Barrier(70, "red", 1480, 1550);
+const barrier = new Barrier(20, "#fac", "./img/enemy/1/enemy.png");
+const barrier2 = new Barrier(70, "red", "./img/enemy/1/enemy.png");
 const player = new Player();
 
 document.addEventListener("keydown", keyDownHandler);
