@@ -5,22 +5,29 @@
 .wrapper {
   margin: 100px auto;
   position: relative;
-  width: 1080px;
-  height: 320px;
+  width: 1480px;
+  height: 520px;
 
   .canvas {
     display: block;
     background: #eee;
     &__form {
       display: none;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       position: absolute;
       top: 0;
       left: 0;
-      width: 1080px;
-      height: 320px;
+      width: 1480px;
+      height: 520px;
       background: #000;
+      // background: url('../img/Background.png') center no-repeat;
+      // background-size: 100% 100%;
+      p{
+        margin-top: 30px;
+        color: #fff;
+      }
     }
     &__score {
       display: none;
@@ -29,8 +36,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 1080px;
-      height: 320px;
+      width: 1480px;
+      height: 520px;
       background: #000;
       color: #fff;
       &-inner {
