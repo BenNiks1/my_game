@@ -9,7 +9,7 @@ class MyGame {
     this.func = func;
     this.play = setInterval(this.func, 10);
 
-    this.speed = 7;
+    this.speed = 4;
     this.score = 0;
     this.life = 0;
     this.x = this.canvas.width - 20;
@@ -19,15 +19,15 @@ class MyGame {
     this.collisionHandler = false;
     this.userName = "";
     this.key = new Date();
-    this.color = "rgb(117, 117, 117)";
+    this.imgSrc = "./img/hero/newPlayer2.png";
   }
 
   startGame() {
-    const enterNameBtn = document.querySelector(".canvas__form");
+    const submitStart = document.querySelector(".canvas__form");
     if (this.pause) {
       clearInterval(this.play);
     }
-    enterNameBtn.onsubmit = (e) => {
+    submitStart.onsubmit = (e) => {
       e.preventDefault();
       this.play = setInterval(this.func, 10);
       const input = document.querySelector(".canvas__input");
@@ -39,40 +39,47 @@ class MyGame {
 
   collision(player, barrier) {
     if (
-      barrier.x + barrier.width >= player.playerX &&
-      barrier.x + barrier.width <= player.playerX + player.width &&
-      barrier.y >= player.playerY &&
-      barrier.y - barrier.height + 10 <=
-        player.playerY - player.jumpHeight + player.height
+      barrier.x + 15 + barrier.frameWidth - 25 >= player.playerX + 95 &&
+      barrier.x + 15 + barrier.frameWidth - 25 <=
+        player.playerX + 95 + player.frameWidth - 195 &&
+      barrier.y + 55 >=
+        player.playerY - player.jumpHeight + player.frameHeight - 80 &&
+      barrier.y + 55 - barrier.frameHeight - 15 <=
+        player.playerY - player.jumpHeight + player.frameHeight - 80
     ) {
       this.collisionHandler = true;
+      this.imgSrc = "./img/hero/hit2.png";
       if (this.collisionHandler) {
         this.collisionHandler = false;
-        this.life = this.life - 1 / 10;
-        this.color = "red";
+        this.life = this.life - 1 / 16;
+
         setTimeout(() => {
-          this.color = "rgb(117, 117, 117)";
+          this.imgSrc = "./img/hero/newPlayer2.png";
           this.life = Math.floor(this.life);
-        }, 100);
+        }, 200);
       }
     } else if (
-      barrier.x + barrier.width >= player.playerX &&
-      barrier.x <= player.playerX
+      barrier.x + 15 + barrier.frameWidth - 25 >= player.playerX + 95 &&
+      barrier.x + 15 <= player.playerX + 95
     ) {
-      this.score = this.score + (1 / 3) * 10;
+      this.score++;
     }
   }
 
   drawBackground() {
+    let bgX = this.canvas.height - 1480
+    
+
     const bg = new Image();
     bg.src = "./img/bg1.png";
-    this.ctx.drawImage(bg, 0, 0, 1480, 520);
+    this.ctx.drawImage(bg,0,0,1480, 520 )
+
   }
 
   drawScore() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#fff";
-    this.ctx.fillText(`Score: ${Math.round(this.score)}`, 8, 20);
+    this.ctx.fillText(`Score: ${this.score}`, 8, 20);
   }
   drawLife() {
     const life = new Image();
@@ -109,17 +116,45 @@ class Player extends MyGame {
     this.width = 50;
     this.height = 70;
     this.jumpCount = 0;
-    this.jumpLength = 35;
+    this.jumpLength = 45;
     this.jumpHeight = 0;
     this.upPressed = false;
     this.downPressed = false;
 
     this.playerX = (this.canvas.width - this.width) / 5;
-    this.playerY = this.canvas.height - this.height;
+    this.playerY = this.canvas.height - 80;
+
+    this.numColumns = 6;
+    this.numRows = 8;
+    this.frameWidth = 1500 / this.numColumns;
+    this.frameHeight = 784 / this.numRows;
+    this.currentFrame = 0;
   }
 
-  jump() {
+  drawPlayer() {
+    const img = new Image();
+    img.src = myGame.imgSrc;
+    this.currentFrame++;
+
+    let maxFrame = this.numColumns * this.numRows - 1;
+    if (this.currentFrame > maxFrame) {
+      this.currentFrame = 0;
+    }
+
+    let column = this.currentFrame % this.numColumns;
+    let row = Math.floor(this.currentFrame / this.numColumns);
+
+    // sit down
+    if (this.downPressed && !this.upPressed) {
+      myGame.imgSrc = "./img/hero/sitdown3.png";
+      this.playerY = this.canvas.height + 40 - this.frameHeight;
+    } else {
+      myGame.imgSrc = "./img/hero/newPlayer2.png";
+      this.playerY = this.canvas.height - this.height;
+    }
+    // jump
     if (this.upPressed) {
+      myGame.imgSrc = "./img/hero/Jump2.png";
       this.jumpCount++;
       this.jumpHeight =
         2 *
@@ -127,59 +162,68 @@ class Player extends MyGame {
         Math.sin((Math.PI * this.jumpCount) / this.jumpLength);
     }
     if (this.jumpCount > this.jumpLength) {
+      myGame.imgSrc = "./img/hero/newPlayer2.png";
       this.jumpCount = 0;
       this.upPressed = false;
       this.jumpHeight = 0;
     }
-    this.status = true;
-  }
-
-  sitDown() {
-    if (this.downPressed && !this.upPressed) {
-      this.height = 30;
-      this.playerY = this.canvas.height - this.height;
-    } else {
-      this.height = 70;
-      this.playerY = this.canvas.height - this.height;
-    }
-  }
-
-  drawPlayer() {
-    this.ctx.beginPath();
-    this.ctx.rect(
+    // drawImage
+    this.ctx.drawImage(
+      img,
+      column * this.frameWidth,
+      row * this.frameHeight,
+      this.frameWidth,
+      this.frameHeight,
       this.playerX,
       this.playerY - this.jumpHeight,
-      this.width,
-      this.height
+      this.frameWidth,
+      this.frameHeight - 15
     );
-    this.ctx.fillStyle = myGame.color;
-    if (myGame.collisionHandler) {
-    }
-    this.ctx.fill();
-    this.ctx.closePath();
   }
 }
 
 class Barrier extends MyGame {
-  constructor(barrierY, color, minWidth, maxWidth) {
+  constructor(imgSrc, imgWidth, imgHeight, numColumns, numRows, barrierY) {
     super(canvas, ctx);
     this.canvas = canvas;
     this.ctx = ctx;
-    this.width = 20;
-    this.height = 20;
-    this.maxWidth = maxWidth;
-    this.minWidth = minWidth;
-    // this.x = Math.floor(Math.random() * this.maxWidth + this.minWidth);
+    this.width = 50;
+    this.height = 80;
     this.x = this.canvas.width + 20;
     this.y = this.canvas.height - barrierY;
-    this.color = color;
+
+    this.img = new Image();
+    this.imgSrc = imgSrc;
+    this.imgWidth = imgWidth;
+    this.imgHeight = imgHeight;
+    this.numColumns = numColumns;
+    this.numRows = numRows;
+    this.frameWidth = this.imgWidth / this.numColumns;
+    this.frameHeight = this.imgHeight / this.numRows;
+    this.currentFrame = 0;
   }
   drawBarrier() {
-    this.ctx.beginPath();
-    this.ctx.rect(this.x, this.y, this.width, this.height);
-    this.ctx.fillStyle = this.color;
-    this.ctx.fill();
-    this.ctx.closePath();
+    this.img.src = this.imgSrc;
+    this.currentFrame++;
+
+    let maxFrame = this.numColumns * this.numRows - 1;
+    if (this.currentFrame > maxFrame) {
+      this.currentFrame = 0;
+    }
+
+    let column = this.currentFrame % this.numColumns;
+    let row = Math.floor(this.currentFrame / this.numColumns);
+    this.ctx.drawImage(
+      this.img,
+      column * this.frameWidth,
+      row * this.frameHeight,
+      this.frameWidth,
+      this.frameHeight,
+      this.x,
+      this.y,
+      this.frameWidth,
+      this.frameHeight
+    );
   }
 }
 const keyDownHandler = (e) => {
@@ -220,7 +264,7 @@ const addUserScore = () => {
   const result = JSON.parse(localStorage.getItem("result") || "[]");
   const user = {
     name: myGame.userName,
-    score: Math.floor(myGame.score / 4) * 10,
+    score: myGame.score,
     key: myGame.key,
   };
   result.push(user);
@@ -260,21 +304,17 @@ const move = (b) => {
 const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   myGame.startGame();
-
-  myGame.drawBackground();
+  myGame.drawBackground()
   player.drawPlayer();
-  player.jump();
-  player.sitDown();
+
   barrier.drawBarrier();
   barrier2.drawBarrier();
+  move(barrier);
+  move(barrier2);
 
   myGame.drawScore();
   myGame.drawLife();
 
-  // barrier.move(barrier);
-  // barrier2.move(barrier2);
-  move(barrier);
-  move(barrier2);
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
@@ -283,9 +323,10 @@ const draw = () => {
     addUserScore();
   }
 };
+
 const myGame = new MyGame(canvas, ctx, draw);
-const barrier = new Barrier(20, "#fac", 1900, 2000);
-const barrier2 = new Barrier(70, "red", 1480, 1550);
+const barrier = new Barrier("./img/enemy/1/enemy.png", 384, 480, 6, 6, 65);
+const barrier2 = new Barrier("./img/enemy/1/enemy.png", 384, 480, 6, 6, 105);
 const player = new Player();
 
 document.addEventListener("keydown", keyDownHandler);
