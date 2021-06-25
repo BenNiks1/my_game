@@ -20,6 +20,8 @@ class MyGame {
     this.userName = "";
     this.key = new Date();
     this.imgSrc = "./img/hero/newPlayer2.png";
+    this.cameraX = 0;
+    this.cameraSpeed = 0;
   }
 
   startGame() {
@@ -67,13 +69,25 @@ class MyGame {
   }
 
   drawBackground() {
-    let bgX = this.canvas.height - 1480
-    
-
     const bg = new Image();
     bg.src = "./img/bg1.png";
-    this.ctx.drawImage(bg,0,0,1480, 520 )
+    const bgWidth = 1480;
 
+    const bgX =
+      Math.floor(this.cameraX / bg.width) * bg.width -
+      (this.cameraX % bg.width);
+    const count = Math.ceil(this.canvas.width / bgWidth) + 2;
+
+    this.cameraSpeed++;
+    for (let i = 0; i < count; i++) {
+      this.ctx.drawImage(
+        bg,
+        bgX + i * bgWidth - this.cameraX,
+        0,
+        bgWidth,
+        this.canvas.height
+      );
+    }
   }
 
   drawScore() {
@@ -288,7 +302,7 @@ const addUserScore = () => {
     canvasScoreInner.appendChild(listItem);
   });
 };
-const move = (b) => {
+const moveBarrier = (b) => {
   b.x -= myGame.speed;
   if (b.x <= 0) {
     b.x = Math.floor(Math.random() * 1800 + 1500);
@@ -304,13 +318,14 @@ const move = (b) => {
 const draw = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   myGame.startGame();
-  myGame.drawBackground()
+  myGame.drawBackground();
+
   player.drawPlayer();
 
   barrier.drawBarrier();
   barrier2.drawBarrier();
-  move(barrier);
-  move(barrier2);
+  moveBarrier(barrier);
+  moveBarrier(barrier2);
 
   myGame.drawScore();
   myGame.drawLife();
@@ -318,10 +333,13 @@ const draw = () => {
   myGame.collision(player, barrier);
   myGame.collision(player, barrier2);
 
+  // endgame
   if (myGame.life < -3) {
     clearInterval(myGame.play);
     addUserScore();
   }
+  // moveBg
+  myGame.cameraX = myGame.cameraSpeed - myGame.canvas.width / 2;
 };
 
 const myGame = new MyGame(canvas, ctx, draw);
